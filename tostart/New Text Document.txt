@@ -1,0 +1,7 @@
+# 1. Stop Docusaurus (Ctrl+C)
+# 2. Restart
+npm start
+
+cd backend
+my_env\Scripts\activate
+uvicorn main:app --reload --host 0.0.0.0 --port 8000

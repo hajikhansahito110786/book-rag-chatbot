@@ -1,0 +1,32 @@
+ I've implemented and tested the RAG Chatbot; here are the final integration steps:
+
+  Setup:
+   1. Environment Variables: Set OPENAI_API_KEY, QDRANT_URL, QDRANT_API_KEY, BOOK_RAG_DOCUSAURUS_URL, and optionally
+      BOOK_RAG_TEST_DOCUSAURUS_URL in a backend/.env file or directly in your environment.
+   2. Backend Dependencies: In backend/, run pip install -r requirements.txt (add qdrant-client if missing).
+   3. Start Backend: In backend/, run python main.py (serves at http://localhost:8000).
+   4. Start Frontend: In project root, npm install && npm start (serves Docusaurus at http://localhost:3000).
+
+  Usage & Verification:
+   1. Ingest Documents: On your Docusaurus site, open the chatbot and click the "Ingest Docusaurus Docs" button to
+      populate the vector store.
+   2. Test Chatbot: Ask questions using both "Entire Book" and "Selected Text" modes.
+   3. Run Backend Tests: In backend/, execute python test_api.py.
+
+  Deployment: Consider Qdrant persistence, API key security, and aligning BOOK_RAG_DOCUSAURUS_URL with your deployed
+  Docusaurus site.
+
+  This completes the task.
+
+                                                                                                                      │
+│ INFO:     Will watch for changes in these directories: ['D:\\aa-w\\gemini\\backend']                                 │
+│ INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)                                              │
+│ INFO:     Started reloader process [8912] using WatchFiles                                                           │
+│ INFO:     Started server process [3596]                                                                              │
+│ INFO:     Waiting for application startup.                                                                           │
+│ Using Qdrant at http://localhost:6333                                                                                │
+│ Could not connect to Qdrant: [WinError 10061] No connection could be made because the target machine activ           │
+│ ely refused it                                                                                                       │
+│ Falling back to local storage                                                                                        │
+│ INFO:     Application startup complete.
+uvicorn main:app --host 0.0.0.0 --port 8000

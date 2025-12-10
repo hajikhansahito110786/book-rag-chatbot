@@ -1,0 +1,38 @@
+<!-- Add this to your index.html -->
+<div id="chatbot-container" class="chatbot-container">
+    <div class="chatbot-header">
+        <h3>📚 Book Assistant</h3>
+        <button id="close-chatbot" class="close-btn">&times;</button>
+    </div>
+    
+    <div class="chatbot-body">
+        <div id="chat-messages" class="chat-messages"></div>
+    </div>
+    
+    <div class="chatbot-footer">
+        <div class="context-mode-selector">
+            <label>
+                <input type="radio" name="context-mode" value="book" checked> Entire Book
+            </label>
+            <label>
+                <input type="radio" name="context-mode" value="selected"> Selected Text Only
+            </label>
+        </div>
+        
+        <div class="text-selection-info" id="selection-info">
+            No text selected
+        </div>
+        
+        <div class="input-area">
+            <input type="text" 
+                   id="chat-input" 
+                   placeholder="Ask about the book..." 
+                   autocomplete="off">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<button id="chatbot-toggle" class="chatbot-toggle-btn">
+    🤖 Ask AI
+</button>

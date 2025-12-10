@@ -1,0 +1,24 @@
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.featureSvg {
+  height: 200px;
+  width: 200px;
+}
+/* Add chatbot styles */
+.chatbotWrapper {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+/* Update existing styles for chatbot integration */
+.mainContent {
+  position: relative;
+  z-index: 1;
+}

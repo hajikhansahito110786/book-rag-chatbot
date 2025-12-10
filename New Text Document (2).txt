@@ -1,0 +1,24 @@
+Endpoint
+https://9daf7826-7fc5-4162-89ec-dfb97ce3da29.europe-west3-0.gcp.cloud.qdrant.io
+Cluster ID
+9daf7826-7fc5-4162-89ec-dfb97ce3da29
+
+Cloud Provider
+europe-west3
+aibook
+
+api key
+********goo8h_UI
+        psql "postgres://[user]:[password]@[host]:[port]/[database]?sslmode=require"
+
+From an Application: If connecting from an application (e.g., Python, Node.js), use a PostgreSQL client library (e.g., psycopg for Python, @neondatabase/serverless for Node.js). Provide the connection string or individual connection parameters to the client library to establish a connection.
+
+cd D:\aa-w\gemini
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+
+git remote add origin https://github.com/hajikhansahito110786/book-rag-chatbot.git
+
+git push -u origin main

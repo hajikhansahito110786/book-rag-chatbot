@@ -1,0 +1,26 @@
+@echo off
+echo === Pushing to GitHub ===
+echo.
+
+echo 1. Checking current branch...
+git branch
+
+echo.
+echo 2. Checking remote...
+git remote -v
+
+echo.
+echo 3. Adding all files...
+git add .
+
+echo 4. Committing...
+git commit -m "Physical AI Textbook v1.0 - AI-driven development complete"
+
+echo.
+echo 5. Pushing to GitHub...
+git push -u origin main --force
+
+echo.
+echo 6. If push fails, try:
+echo    git push -u origin HEAD:main --force
+pause
