@@ -15,7 +15,11 @@ const config: Config = {
   deploymentBranch: 'gh-pages',
 
   onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
+    markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   i18n: {
     defaultLocale: 'en',
@@ -86,7 +90,7 @@ const config: Config = {
               label: 'How it works',
             },
             {
-              href: 'http://localhost:8000/docs',
+              href: 'http://148.230.88.136:8900/docs',
               label: 'API Docs',
               target: '_blank',
             },
