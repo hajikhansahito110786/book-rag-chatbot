@@ -1,0 +1,79 @@
+D:\aa-w\gemini\backend\main.py:10: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+D:\aa-w\gemini\backend\main.py:33: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+INFO:     Will watch for changes in these directories: ['D:\\aa-w\\gemini']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [7260] using WatchFiles
+D:\aa-w\gemini\backend\main.py:10: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+INFO:     Started server process [2720]
+INFO:     Waiting for application startup.
+ERROR:    Traceback (most recent call last):
+  File "D:\aa-w\gemini\backend\vector_store.py", line 51, in initialize
+    print(f"\U0001f4e6 Using existing collection: {self.collection_name}")
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4e6' in position 0: character maps to <undefined>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 677, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 566, in __aenter__
+    await self._router.startup()
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\site-packages\starlette\routing.py", line 654, in startup
+    await handler()
+  File "D:\aa-w\gemini\backend\main.py", line 50, in startup_event
+    await vector_store.initialize()
+  File "D:\aa-w\gemini\backend\vector_store.py", line 55, in initialize
+    print(f"\u274c Could not connect to Qdrant at {self.qdrant_url}. Please check if the server is running and accessible.")
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u274c' in position 0: character maps to <undefined>
+
+ERROR:    Application startup failed. Exiting.
+---
+DEBUG: Found qdrant-client version: 1.9.1
+---
+Using REMOTE Qdrant at http://148.230.88.136:6333
+WARNING:  WatchFiles detected changes in 'backend\vector_store.py'. Reloading...
+D:\aa-w\gemini\backend\main.py:10: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+WARNING:  WatchFiles detected changes in 'backend\vector_store.py'. Reloading...
+Process SpawnProcess-2:
+Traceback (most recent call last):
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\process.py", line 314, in _bootstrap
+    self.run()
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\multiprocessing\process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\site-packages\uvicorn\_subprocess.py", line 73, in subprocess_started
+    config.configure_logging()
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\site-packages\uvicorn\config.py", line 393, in configure_logging
+    logging.config.dictConfig(self.log_config)
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\logging\config.py", line 942, in dictConfig
+    dictConfigClass(config).configure()
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\logging\config.py", line 544, in configure
+    incremental = config.pop('incremental', False)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\logging\config.py", line 353, in pop
+    return self.convert_with_key(key, value, replace=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\logging\config.py", line 311, in convert_with_key
+    result = self.configurator.convert(value)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hkjuly25\AppData\Local\Programs\Python\Python312\Lib\logging\config.py", line 455, in convert
+    def convert(self, value):
+    
+KeyboardInterrupt
+D:\aa-w\gemini\backend\main.py:10: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources

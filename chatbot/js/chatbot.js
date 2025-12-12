@@ -1,7 +1,7 @@
 // Simple Chatbot Implementation
 class SimpleChatbot {
     constructor() {
-        this.API_URL = 'http://148.230.88.136:8900/api';
+        this.API_URL = 'http://localhost:8000/api';
         this.selectedText = '';
         this.contextMode = 'book';
         

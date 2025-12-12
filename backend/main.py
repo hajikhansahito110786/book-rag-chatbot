@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 import json
 import asyncio # Import asyncio
+import pkg_resources
 from vector_store import VectorStore # Import VectorStore
 from book_ingester import DocusaurusPageDiscoverer, ingest_docusaurus_book, chunk_content # Import ingester functions
 
@@ -32,8 +33,30 @@ vector_store: Optional[VectorStore] = None
 @app.on_event("startup")
 async def startup_event():
     global vector_store
-    vector_store = VectorStore()
-    await vector_store.initialize()
+
+    try:
+        vector_store = VectorStore()
+        await vector_store.initialize()
+
+        # Check if the vector store is empty and seed it if it is
+        if await vector_store.is_empty():
+            print("Vector store is empty. Seeding with initial data...")
+            try:
+                seed_data_path = os.path.join(os.path.dirname(__file__), "seed_data.json")
+                with open(seed_data_path, "r") as f:
+                    seed_data = json.load(f)                
+                await vector_store.add_documents(seed_data)
+                print("Successfully seeded the vector store with initial data.")
+            except FileNotFoundError:
+                print("Could not find seed_data.json. Skipping seeding process.")
+            except Exception as e:
+                import traceback
+                print(f"An error occurred during seeding: {e}")
+                traceback.print_exc() # Print full traceback
+    except Exception as e:
+        import traceback
+        print(f"Error during VectorStore initialization or startup event: {e}")
+        traceback.print_exc() # Print full traceback
 
 class QuestionRequest(BaseModel):
     question: str
@@ -93,7 +116,11 @@ async def ask_question(request: QuestionRequest):
         }
         
     except Exception as e:
+        import traceback
+        print(f"Error type: {type(e)}")
+        print(f"Error message: {e}")
         print(f"Error in ask_question: {str(e)}")
+        traceback.print_exc() # Print full traceback
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/ingest-docs")
@@ -105,18 +132,13 @@ async def ingest_documents(request: IngestRequest):
         raise HTTPException(status_code=503, detail="Vector store not initialized.")
 
     try:
-        # Determine base_url
-        docusaurus_base_url = request.base_url or os.getenv("BOOK_RAG_DOCUSAURUS_URL")
-        if not docusaurus_base_url:
-            raise HTTPException(status_code=400, detail="Docusaurus base URL not provided or configured.")
-        
         # Discover pages
-        discoverer = DocusaurusPageDiscoverer(project_root=".") # Assume project root is current dir for main.py
+        discoverer = DocusaurusPageDiscoverer(project_root=os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
         page_paths = discoverer.discover_pages()
-        print(f"Discovered {len(page_paths)} pages.")
+        print(f"Discovered {len(page_paths)} pages: {page_paths}")
 
-        # Scrape and chunk content
-        scraped_content = await ingest_docusaurus_book(docusaurus_base_url, page_paths)
+        # Scrape and chunk content from local files
+        scraped_content = await ingest_docusaurus_book(discoverer.project_root, page_paths)
         chunks = chunk_content(scraped_content, request.chunk_size)
         print(f"Generated {len(chunks)} chunks.")
 
@@ -153,9 +175,11 @@ async def get_status():
 async def generate_answer(question: str, context: str) -> str:
     """Generate answer using OpenAI"""
     
-    system_prompt = """You are a helpful assistant that answers questions based ONLY on the provided context.
-    If the context doesn't contain enough information to answer the question, say "I cannot answer this based on the available information."
-    Be precise and concise in your answers."""
+    system_prompt = """You are Docus, a friendly and helpful assistant. Your goal is to answer questions based ONLY on the provided context.
+    You must be very clear with the user that you can only answer questions about the documents you have been given.
+    If the context doesn't contain enough information to answer the question, you should say so in a friendly and helpful way.
+    For example, you could say "I'm sorry, as Docus, my knowledge is limited to the documents I've been given. I couldn't find any information about that topic. Is there a question about the provided documents I can help with?".
+    Never try to answer a question if the information is not in the context."""
     
     user_prompt = f"""Context: {context}
 
@@ -177,7 +201,7 @@ Please answer based ONLY on the context provided above."""
         return response.choices[0].message.content.strip()
         
     except Exception as e:
-        return f"I apologize, but I encountered an error: {str(e)}"
+        return f"I seem to be having some trouble thinking right now. Please try again in a moment. (Error: {str(e)})"
 
 if __name__ == "__main__":
     import uvicorn

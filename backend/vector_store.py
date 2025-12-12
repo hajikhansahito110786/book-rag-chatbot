@@ -3,168 +3,121 @@ import openai
 import numpy as np
 from typing import List, Dict, Any
 import hashlib
+import uuid
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
-import asyncio
 
 class VectorStore:
     def __init__(self):
+        # ===== ENV CONFIG =====
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
-        self.qdrant_url = os.getenv("QDRANT_URL", "http://localhost:6333")
-        self.qdrant_api_key = os.getenv("QDRANT_API_KEY", "")
-        
-        # Initialize OpenAI client
-        self.client = openai.OpenAI(api_key=self.openai_api_key)
-        
-        # Use local storage if no Qdrant URL provided
-        if not self.qdrant_url.startswith("http"):
-            self.use_local = True
-            self.collection_name = "book_chunks"
-            self.documents = []
-            self.embeddings = []
-            print("Using local vector storage")
-        else:
-            self.use_local = False
-            self.qdrant_client = QdrantClient(
-                url=self.qdrant_url,
-                api_key=self.qdrant_api_key if self.qdrant_api_key else None
-            )
-            self.collection_name = "book_chunks"
-            print(f"Using Qdrant at {self.qdrant_url}")
-        
+        self.qdrant_url = os.getenv("QDRANT_URL")  # NO DEFAULT localhost
+        self.qdrant_api_key = os.getenv("QDRANT_API_KEY")
+
+        if not self.qdrant_url:
+            raise RuntimeError("QDRANT_URL is not set")
+
+        # ===== CLIENTS =====
+        self.openai_client = openai.OpenAI(api_key=self.openai_api_key)
+
+        self.qdrant_client = QdrantClient(
+            url=self.qdrant_url,
+            api_key=self.qdrant_api_key or None,
+            timeout=10
+        )
+
+        self.collection_name = "book_chunks"
+        self.vector_size = 1536
         self.initialized = False
-    
+
+        print(f"Using REMOTE Qdrant at {self.qdrant_url}")
+
     async def initialize(self):
-        """Initialize vector store"""
-        if not self.use_local:
-            try:
-                # Try to get existing collections
-                collections = self.qdrant_client.get_collections()
-                collection_names = [col.name for col in collections.collections]
-                
-                if self.collection_name not in collection_names:
-                    # Create new collection
-                    self.qdrant_client.create_collection(
-                        collection_name=self.collection_name,
-                        vectors_config=VectorParams(size=1536, distance=Distance.COSINE)
-                    )
-                    print(f"Created new collection: {self.collection_name}")
-                else:
-                    print(f"Using existing collection: {self.collection_name}")
-                    
-            except Exception as e:
-                print(f"Could not connect to Qdrant: {e}")
-                print("Falling back to local storage")
-                self.use_local = True
-        
-        self.initialized = True
-        return True
-    
-    async def get_embedding(self, text: str) -> List[float]:
-        """Get embedding from OpenAI"""
+        """Initialize Qdrant collection"""
         try:
-            response = self.client.embeddings.create(
-                model="text-embedding-ada-002",
-                input=text
-            )
-            return response.data[0].embedding
-        except Exception as e:
-            print(f"Error getting embedding: {e}")
-            # Return random embedding as fallback
-            return list(np.random.randn(1536))
-    
-    async def add_documents(self, documents: List[Dict[str, Any]]):
-        """Add documents to vector store"""
-        if not self.initialized:
-            await self.initialize()
-        
-        print(f"Adding {len(documents)} documents to vector store...")
-        
-        if self.use_local:
-            # Store locally
-            for doc in documents:
-                embedding = await self.get_embedding(doc['text'])
-                self.documents.append(doc)
-                self.embeddings.append(embedding)
-            print(f"Added {len(documents)} documents to local storage")
-        else:
-            # Store in Qdrant
-            points = []
-            for i, doc in enumerate(documents):
-                embedding = await self.get_embedding(doc['text'])
-                
-                # Create unique ID
-                doc_hash = hashlib.md5(doc['text'].encode()).hexdigest()[:16]
-                
-                point = PointStruct(
-                    id=i,
-                    vector=embedding,
-                    payload={
-                        "text": doc['text'],
-                        "source": doc.get('source', 'unknown'),
-                        "chunk_id": doc.get('chunk_id', 0),
-                        "doc_hash": doc_hash
-                    }
+            collections = self.qdrant_client.get_collections().collections
+            collection_names = [c.name for c in collections]
+
+            if self.collection_name not in collection_names:
+                self.qdrant_client.create_collection(
+                    collection_name=self.collection_name,
+                    vectors_config=VectorParams(
+                        size=self.vector_size,
+                        distance=Distance.COSINE
+                    )
                 )
-                points.append(point)
-            
-            # Upload to Qdrant
-            self.qdrant_client.upsert(
-                collection_name=self.collection_name,
-                points=points
+                print(f"Created collection: {self.collection_name}")
+            else:
+                print(f"Using existing collection: {self.collection_name}")
+
+            self.initialized = True
+        except Exception as e:
+            print(f"Could not connect to Qdrant at {self.qdrant_url}. Please check if the server is running and accessible.")
+            raise RuntimeError(f"Could not connect to Qdrant. Please check your connection and firewall settings. Error: {e}")
+
+    async def get_embedding(self, text: str) -> List[float]:
+        """Create embedding"""
+        response = self.openai_client.embeddings.create(
+            model="text-embedding-3-small",
+            input=text
+        )
+        return response.data[0].embedding
+
+    async def add_documents(self, documents: List[Dict[str, Any]]):
+        if not self.initialized:
+            await self.initialize()
+
+        points = []
+
+        for doc in documents:
+            embedding = await self.get_embedding(doc["text"])
+
+            point = PointStruct(
+                id=str(uuid.uuid4()),  # SAFE UNIQUE ID
+                vector=embedding,
+                payload={
+                    "text": doc["text"],
+                    "source": doc.get("source", "unknown"),
+                    "chunk_id": doc.get("chunk_id", 0)
+                }
             )
-            print(f"Uploaded {len(points)} documents to Qdrant")
-    
+            points.append(point)
+
+        self.qdrant_client.upsert(
+            collection_name=self.collection_name,
+            points=points
+        )
+
+        print(f"Uploaded {len(points)} documents to Qdrant")
+
     async def search(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
-        """Search for similar documents"""
+        if not self.initialized:
+            await self.initialize()
+
+        query_embedding = await self.get_embedding(query)
+
+        hits = self.qdrant_client.search(
+            collection_name=self.collection_name,
+            query_vector=query_embedding,
+            limit=limit
+        )
+
+        return [
+            {
+                "text": hit.payload.get("text", ""),
+                "source": hit.payload.get("source", "unknown"),
+                "score": hit.score
+            }
+            for hit in hits
+        ]
+
+    async def is_empty(self) -> bool:
+        """Check if the collection is empty."""
         if not self.initialized:
             await self.initialize()
         
-        # Get query embedding
-        query_embedding = await self.get_embedding(query)
-        
-        if self.use_local:
-            # Local similarity search (simple cosine similarity)
-            if not self.embeddings:
-                return []
-            
-            # Convert to numpy arrays
-            query_vec = np.array(query_embedding)
-            doc_vecs = np.array(self.embeddings)
-            
-            # Calculate cosine similarities
-            similarities = np.dot(doc_vecs, query_vec) / (
-                np.linalg.norm(doc_vecs, axis=1) * np.linalg.norm(query_vec)
-            )
-            
-            # Get top matches
-            top_indices = np.argsort(similarities)[-limit:][::-1]
-            
-            results = []
-            for idx in top_indices:
-                if idx < len(self.documents):
-                    results.append({
-                        "text": self.documents[idx]['text'],
-                        "source": self.documents[idx].get('source', 'local'),
-                        "score": float(similarities[idx])
-                    })
-            
-            return results
-        
-        else:
-            # Search in Qdrant
-            search_result = self.qdrant_client.search(
-                collection_name=self.collection_name,
-                query_vector=query_embedding,
-                limit=limit
-            )
-            
-            results = []
-            for hit in search_result:
-                results.append({
-                    "text": hit.payload.get("text", ""),
-                    "source": hit.payload.get("source", "unknown"),
-                    "score": hit.score
-                })
-            
-            return results
+        count_result = self.qdrant_client.count(
+            collection_name=self.collection_name, 
+            exact=False
+        )
+        return count_result.count == 0

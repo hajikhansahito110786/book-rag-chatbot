@@ -1,0 +1,11 @@
+cd /opt/book-rag-chatbot/backend
+source .venv/bin/activate
+uvicorn main:app --host 0.0.0.0 --port 8900
+
+/opt/book-rag-chatbot/backend# uvicorn main:app --host 0.0.0.0 --port 8900
+
+D:\aa-w\gemini\backend>curl http://148.230.88.136:8900/collections
+{"detail":"Not Found"}
+D:\aa-w\gemini\backend>curl http://148.230.88.136:6333/collections
+{"result":{"collections":[{"name":"book_chunks"},{"name":"aiproject1_chapters"}]},"status":"ok","time":6.29e-6}
+D:\aa-w\gemini\backend>

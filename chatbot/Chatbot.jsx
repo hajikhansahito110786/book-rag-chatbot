@@ -17,8 +17,8 @@ const Chatbot = () => {
   const [isIngesting, setIsIngesting] = useState(false); // New state for ingestion
   const messagesEndRef = useRef(null);
 
-  const API_BASE = 'http://localhost:8000/api';
-
+  //const API_BASE = 'http://localhost:8000/api';
+  const API_BASE = 'http://localhost:8000/api'
   useEffect(() => {
     // Load saved state
     const savedState = localStorage.getItem('chatbotState');

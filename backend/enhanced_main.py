@@ -105,4 +105,4 @@ Please provide a helpful answer based only on the book context above."""
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=80001)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

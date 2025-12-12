@@ -231,7 +231,7 @@ function injectChatbotCSS() {
 class AllInOneChatbot {
     constructor() {
         console.log('🤖 Creating AllInOneChatbot...');
-        this.API_URL = 'http://localhost:8000/api';
+        this.API_URL = 'http://148.230.88.136:8900/api';
         this.isOpen = false;
         this.init();
     }
@@ -514,9 +514,9 @@ function createTestButton() {
     
     testBtn.onclick = async function() {
         try {
-            const response = await fetch('http://localhost:8000/api/status');
+            const response = await fetch('http://148.230.88.136:8900/api/status');
             const data = await response.json();
-            alert(`✅ Backend Connected!\n\nStatus: ${data.status}\nAPI: http://localhost:8000`);
+            alert(`✅ Backend Connected!\n\nStatus: ${data.status}\nAPI: http://148.230.88.136:8900/api`);
         } catch (error) {
             alert(`❌ Backend Error!\n\n${error.message}\n\nStart backend:\ncd backend\nuvicorn main:app --reload`);
         }
