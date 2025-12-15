@@ -2,20 +2,11 @@
 ---
 Sync Impact Report
 ---
-- Version change: None -> 1.0.0
-- Added Principles:
-  - I. Spec-Driven Development
-  - II. Atomic, Testable Tasks
-  - III. Agent-First Workflow
-  - IV. Immutable History
-  - V. Convention Over Configuration
-  - VI. Self-Documenting System
-- Added Sections:
-  - Development Standards
-  - Quality Assurance
+- Version change: 1.0.0 -> 1.0.1
+- Added Principles: None
+- Added Sections: None
 - Removed Sections: None
-- Templates requiring updates:
-  - ✅ .specify/templates/plan-template.md
+- Templates requiring updates: None
 - Follow-up TODOs: None
 -->
 # Gemini CLI Constitution
@@ -52,4 +43,4 @@ Automated testing is mandatory. Unit tests are required for all new logic. Integ
 
 This Constitution is the authoritative source for project standards. Any proposed amendment requires an Architectural Decision Record (ADR) and approval from the project lead. All code reviews MUST validate compliance with these principles.
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-06 | **Last Amended**: 2025-12-06
+**Version**: 1.0.1 | **Ratified**: 2025-12-06 | **Last Amended**: 2025-12-15
